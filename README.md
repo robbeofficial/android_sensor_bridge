@@ -1,7 +1,5 @@
 # Android sensor bridge for ROS
-Publish sensor data from your phone (connected via WiFi or USB) to ROS Edit
-Add topics
-
+Publish sensor data from your phone (connected via WiFi or USB) to ROS.
 
 ## Overview
 
