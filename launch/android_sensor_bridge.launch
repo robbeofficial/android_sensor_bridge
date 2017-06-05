@@ -1,0 +1,4 @@
+<launch>
+  <node name="ip_webcam_bridge" pkg="android_sensor_bridge" type="ip_webcam_bridge.py" />
+  <node name="sensrec_bridge" pkg="android_sensor_bridge" type="sensrec_bridge.py" />
+</launch>
