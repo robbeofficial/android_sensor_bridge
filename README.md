@@ -9,7 +9,7 @@ A collection of python scripts that publish sensor data from your phone (connect
 * `ip_webcam_bridge.py`: Connects to [IP Webcam](https://play.google.com/store/apps/details?id=com.pas.webcam) and publishes camera images as `sensor_msgs/CompressedImage`. Launch `http://<phone_ip>:<port>` in the browser to configure!
 
 * `sensrec_bridge.py`: Connects to [Sensors Record](https://play.google.com/store/apps/details?id=pl.mrwojtek.sensrec.app) and publishes:
-    - `sensor_msgs/Imu` inertia measurement based on phone's rotation vector, linear acceleration and gyroscope
+    - `sensor_msgs/Imu` inertial measurement based on phone's rotation vector, linear acceleration and gyroscope
     - `sensor_msgs/MagneticField` magnetic field based on phone's magnetometer
     - `nmea_msgs/Sentence` low-level GPS NMEA sentecnes for processing with 3rd party tools (e.g. `nmea_navsat_driver`)
     - `sensor_msgs/NavSatFix` location based on phone's location API
