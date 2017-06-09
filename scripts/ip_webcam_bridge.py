@@ -15,7 +15,8 @@ from sensor_msgs.msg import CompressedImage
 #  https://play.google.com/store/apps/details?id=com.pas.webcam&hl=de
 #  use it's browser interface to configure
 
-# TODO allow changing of parameters through ROS messages
+# TODO allow changing of parameters through ROS messages / dynamic reconf
+# publish current camera settings as ros message
 # TODO create class
 
 if __name__ == '__main__':
