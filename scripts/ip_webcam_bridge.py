@@ -4,14 +4,12 @@
 
 # Run IP Webcam on your android phone
 #  https://play.google.com/store/apps/details?id=com.pas.webcam&hl=de
-#  use it's browser interface to configure
+#  use it's browser interface (or ROS service calls) to configure
 
-# TODO allow changing of parameters through ROS messages / dynamic reconf
-# publish current camera settings as ros message
 # TODO create class
 # TODO doc: did not use dynreconf because too static
 # TODO check if it's okay to use msg.String instead of srv.GetStringResponse
-# TODO logging instead of print
+# TODO add success flag or similar to service calls
 
 import urllib2
 import requests
@@ -31,8 +29,8 @@ def setting_get(setting):
 
 def setting_options(setting):
     status = requests.get(hoststr + '/status.json', params = {'show_avail': 1}).json()
-    return std_msgs.msg.String(';'.join(status['avail'][setting])) # TODO catch key error
-
+    return std_msgs.msg.String('; '.join(status['avail'][setting])) 
+    
 def setting_set(setting, req):
     # torch: /enabletorch /disabletorch
     # focus: /focus /nofocus
@@ -48,25 +46,29 @@ def setting_set(setting, req):
     
     # try calling them
     for entry_point in entry_points:
-        print('querying ' + entry_point)
+        rospy.loginfo('querying ' + entry_point)
         http = requests.get(entry_point)
         if http.status_code == 200:
             break
 
-    resp = http.text
-    return std_msgs.msg.String(resp) 
+    return android_sensor_bridge.srv.SetStringResponse()
     
 def add_settings_services():
-    settings = requests.get(hoststr + '/status.json').json()['curvals'].keys()
+    status = requests.get(hoststr + '/status.json', params = {'show_avail': 1}).json()
+
+    curvals = status['curvals'].keys()
+    avail = status['avail'].keys()
     
-    for setting in settings:
-        if setting != " ":
+    for setting in curvals:
+        if setting != " ": # TODO more generic?
+            rospy.loginfo('Adding setting ' + setting)
             rospy.Service("~" + setting + "/get", android_sensor_bridge.srv.GetString, 
                 lambda req, setting=setting : setting_get(setting)) 
-            rospy.Service("~" + setting + "/options", android_sensor_bridge.srv.GetString, 
-                lambda req, setting=setting : setting_options(setting))
             rospy.Service("~" + setting + "/set", android_sensor_bridge.srv.SetString, 
-                lambda req, setting=setting : setting_set(setting, req)) 
+                lambda req, setting=setting : setting_set(setting, req))
+            if setting in avail: 
+                rospy.Service("~" + setting + "/options", android_sensor_bridge.srv.GetString, 
+                    lambda req, setting=setting : setting_options(setting))
 
 if __name__ == '__main__':
     rospy.init_node('ip_webcam_bridge')
@@ -75,7 +77,7 @@ if __name__ == '__main__':
     host = rospy.get_param('~host', '192.168.43.1')
     port = rospy.get_param('~port', 8080)
 
-    hoststr = 'http://{}:{}/'.format(host, port)
+    hoststr = 'http://{}:{}'.format(host, port)
 
     # pubs
     pub_image = rospy.Publisher('~image/compressed', sensor_msgs.msg.CompressedImage, queue_size=1)
